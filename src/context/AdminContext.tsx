@@ -28,6 +28,9 @@ interface AdminContextType {
     addAchievement: (a: Achievement) => Promise<void>;
     deleteAchievement: (id: string) => Promise<void>;
 
+    addExperience: (e: any) => Promise<void>;
+    deleteExperience: (id: string) => Promise<void>;
+
     updateProfile: (p: any) => Promise<void>;
 
     isLoading: boolean;
@@ -38,7 +41,7 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [data, setData] = useState<AdminData>({ projects: [], skills: [], achievements: [], profile: {} as any });
+    const [data, setData] = useState<AdminData>({ projects: [], skills: [], achievements: [], experiences: [], profile: {} as any });
     const [isLoading, setIsLoading] = useState(true);
 
     // Initial Load
@@ -136,6 +139,16 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         refreshData();
     };
 
+    const addExperience = async (e: any) => {
+        await adminDataService.addExperience(e);
+        refreshData();
+    };
+
+    const deleteExperience = async (id: string) => {
+        await adminDataService.deleteExperience(id);
+        refreshData();
+    };
+
     const updateProfile = async (p: any) => {
         await adminDataService.updateProfile(p);
         refreshData();
@@ -154,6 +167,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             addProject, updateProject, deleteProject,
             addSkillCategory, addSkillItem, deleteSkillItem, deleteSkillCategory,
             addAchievement, deleteAchievement,
+            addExperience, deleteExperience,
             updateProfile,
             saveData
         }}>
