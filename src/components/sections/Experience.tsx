@@ -1,15 +1,39 @@
 "use client";
 
-import { experiences } from "@/lib/data";
+import { adminDataService } from "@/lib/adminData";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
 import { motion } from "framer-motion";
 import { Briefcase } from "lucide-react";
 
 export function Experience() {
+    const [experiences, setExperiences] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchExperience = async () => {
+            try {
+                const data = await adminDataService.getData();
+                setExperiences(data.experiences);
+            } catch (error) {
+                console.error("Failed to fetch experiences:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchExperience();
+    }, []);
+
+    // Helper to calculate duration or show present
+    const getDuration = (start: string, end: string) => {
+        return `${start} - ${end}`;
+    };
+
     return (
-        <Section id=" تجربه" className="relative"> {/* Typo in ID meant 'experience', fixing to english 'experience' in logic below but using prompt's section naming loosely */}
-            <div id="experience" className="absolute -top-20" /> {/* Anchor adjustment */}
+        <Section id="experience" className="relative">
+            {/* Anchor adjustment */}
 
             <div className="flex flex-col gap-4 mb-16 text-center">
                 <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
@@ -41,7 +65,7 @@ export function Experience() {
                             {/* Date (Desktop) */}
                             <div className={`hidden md:block w-1/2 pt-2 ${index % 2 === 0 ? "text-left pl-12" : "text-right pr-12"}`}>
                                 <span className="text-accent font-mono text-sm tracking-widest uppercase">
-                                    {exp.startDate} - {exp.endDate}
+                                    {getDuration(exp.startDate, exp.endDate)}
                                 </span>
                             </div>
 
@@ -50,7 +74,7 @@ export function Experience() {
                                 <Card gradient className={`md:mx-8 ${index % 2 === 0 ? "md:mr-0" : "md:ml-0"}`}>
                                     <div className="flex flex-col gap-2 mb-4">
                                         <div className="md:hidden text-accent font-mono text-xs tracking-widest uppercase mb-1">
-                                            {exp.startDate} - {exp.endDate}
+                                            {getDuration(exp.startDate, exp.endDate)}
                                         </div>
                                         <h3 className="text-xl font-bold text-white">{exp.role}</h3>
                                         <div className="flex items-center gap-2 text-primary font-medium">
@@ -59,7 +83,7 @@ export function Experience() {
                                         </div>
                                     </div>
                                     <ul className="space-y-2">
-                                        {exp.points.map((point, i) => (
+                                        {exp.points.map((point: string, i: number) => (
                                             <li key={i} className="text-white/70 text-sm flex items-start gap-2">
                                                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
                                                 {point}

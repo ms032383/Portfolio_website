@@ -1,6 +1,8 @@
 "use client";
 
 import { personalInfo, skills } from "@/lib/data";
+import { adminDataService } from "@/lib/adminData";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
 import { motion } from "framer-motion";
@@ -8,6 +10,16 @@ import { Code2, Database, Layout, PenTool, Award, ExternalLink } from "lucide-re
 import Link from "next/link";
 
 export function About() {
+    const [profile, setProfile] = useState<any>(personalInfo);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const data = await adminDataService.getData();
+            if (data.profile) setProfile(data.profile);
+        };
+        fetchProfile();
+    }, []);
+
     return (
         <Section id="about" className="relative">
             <div className="flex flex-col gap-4 mb-16 text-center">
@@ -24,17 +36,16 @@ export function About() {
                         <span className="text-primary">01.</span> Background
                     </h3>
                     <p className="text-white/70 leading-relaxed text-lg">
-                        I am a final year <b>B.Tech in CS (AI & Data Science)</b> student at Galgotia's University.
-                        My passion lies in bridging the gap between robust backends and intuitive mobile/web interfaces.
+                        {profile.tagline}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div className="p-4 rounded-lg bg-white/5 border border-white/5">
                             <span className="text-sm text-white/40 block mb-1">LeetCode Rating</span>
-                            <span className="text-xl font-mono text-accent">{personalInfo.stats.leetcode}</span>
+                            <span className="text-xl font-mono text-accent">{profile.stats?.leetcode || "N/A"}</span>
                         </div>
                         <div className="p-4 rounded-lg bg-white/5 border border-white/5">
                             <span className="text-sm text-white/40 block mb-1">Problems Solved</span>
-                            <span className="text-xl font-mono text-primary">{personalInfo.stats.problemsSolved}</span>
+                            <span className="text-xl font-mono text-primary">{profile.stats?.problemsSolved || "N/A"}</span>
                         </div>
                     </div>
                 </Card>

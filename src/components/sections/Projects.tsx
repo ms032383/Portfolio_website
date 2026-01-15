@@ -1,6 +1,6 @@
 "use client";
 
-import { projects } from "@/lib/data";
+import { adminDataService } from "@/lib/adminData";
 import { Project } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -9,7 +9,7 @@ import { Section } from "@/components/ui/Section";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink, Github, Layers } from "lucide-react";
 import Image from "next/image"; // Placeholder usage
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const categories = ["All", "Mobile", "Web"] as const;
@@ -17,6 +17,23 @@ const categories = ["All", "Mobile", "Web"] as const;
 export function Projects() {
     const [filter, setFilter] = useState<typeof categories[number]>("All");
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const data = await adminDataService.getData();
+                setProjects(data.projects);
+            } catch (error) {
+                console.error("Failed to fetch projects:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProjects();
+    }, []);
 
     const filteredProjects = projects.filter(
         (p) => filter === "All" || p.category === filter || p.category === "All" // 'All' category projects show in both
@@ -38,8 +55,8 @@ export function Projects() {
                         key={cat}
                         onClick={() => setFilter(cat)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === cat
-                                ? "bg-primary text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]"
-                                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                            ? "bg-primary text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]"
+                            : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
                             }`}
                     >
                         {cat}

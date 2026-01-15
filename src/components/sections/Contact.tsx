@@ -1,5 +1,7 @@
 "use client";
 
+import { adminDataService } from "@/lib/adminData";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -18,11 +20,14 @@ export function Contact() {
         e.preventDefault();
         setStatus("loading");
 
-        // Simulate EmailJS call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        setStatus("success");
-        setFormState({ name: "", email: "", message: "" });
+        try {
+            await adminDataService.sendMessage(formState.name, formState.email, formState.message);
+            setStatus("success");
+            setFormState({ name: "", email: "", message: "" });
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            setStatus("error");
+        }
 
         // Reset status after 3 seconds
         setTimeout(() => setStatus("idle"), 3000);

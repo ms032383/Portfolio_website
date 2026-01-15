@@ -1,13 +1,22 @@
 "use client";
 
-import { projects } from "@/lib/data";
+import { adminDataService } from "@/lib/adminData";
 import { Folder, ArrowLeft, Globe, Github, X, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Project } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function ProjectsExplorer() {
     const [activeProject, setActiveProject] = useState<Project | null>(null);
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            const data = await adminDataService.getData();
+            setProjects(data.projects);
+        };
+        fetchProjects();
+    }, []);
 
     return (
         <div className="h-full bg-gradient-to-br from-[#1e1e2e] to-[#151520] relative overflow-hidden font-sans text-white">
